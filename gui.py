@@ -4,20 +4,35 @@ import PySimpleGUI as sg
 label = sg.Text('Enter a To-Do item')
 input_box = sg.InputText(tooltip='Enter To-Do', key='todo')
 add_button = sg.Button('Add')
+list_box = sg.Listbox(values=functions.get_todos(), key='selected_todo', enable_events=True, size= [45, 10])
+edit_button = sg.Button('Edit')
 
 window = sg.Window('My To-Do App',
-                   layout=[[label], [input_box, add_button]],
+                   layout=[[label], [input_box, add_button], [list_box, edit_button]],
                            font=('Helvetica', 20))
 while True:
     event, values = window.read()
-    print(event)
-    print(values)
+    print(1, event)
+    print(2, values)
+    print(3, values['selected_todo'])
     match event:
         case 'Add':
             todos = functions.get_todos()
             new_todo = values['todo'] + '\n'
             todos.append(new_todo)
             functions.write_todos(todos)
+            window['selected_todo'].update(values=todos)
+        case 'Edit':
+            todo_to_edit = values['selected_todo'][0]
+            new_todo = values['todo'].strip('\n') + '\n'
+
+            todos = functions.get_todos()
+            index = todos.index(todo_to_edit)
+            todos[index] = new_todo
+            functions.write_todos(todos)
+            window['selected_todo'].update(values=todos)
+        case 'selected_todo':
+            window['todo'].update(value=values['selected_todo'][0])
         case sg.WIN_CLOSED:
             break
 
